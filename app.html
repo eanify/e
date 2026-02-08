@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SyEarn Pro</title>
+    
+    <!-- CDNs -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://app.adsgram.ai/js/adsgram-ad-sdk.js"></script>
+
+    <style>
+        :root {
+            --sky: #00d2ff;
+            --gold: #FFD700;
+            --white: #ffffff;
+            --light: #f8fafc;
+            --text: #1e293b;
+            --gray: #94a3b8;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--white);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            padding-bottom: 80px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Header Area */
+        .header {
+            background: var(--white);
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .balance-box {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .coin-txt { font-family: 'Orbitron', sans-serif; font-size: 28px; color: var(--text); }
+
+        /* Watch Button & Loading Style */
+        .engine-box { text-align: center; padding: 20px 0; }
+
+        .watch-btn {
+            width: 150px;
+            height: 150px;
+            background: var(--white);
+            border-radius: 30px;
+            margin: 10px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 3px solid var(--sky);
+            box-shadow: 0 8px 20px rgba(0, 210, 255, 0.15);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .watch-btn i { font-size: 40px; color: var(--sky); }
+        .watch-btn span { color: var(--sky); font-weight: bold; margin-top: 8px; font-size: 11px; letter-spacing: 1px; }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--sky);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Task List Under Rewards */
+        .home-tasks { padding: 20px; text-align: left; }
+        .task-card {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #f1f5f9;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .btn-go { background: var(--sky); color: white; border: none; padding: 8px 15px; border-radius: 10px; font-weight: bold; font-size: 12px; }
+
+        /* Navigation Bar (Flat) */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            height: 65px;
+            background: var(--white);
+            border-top: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .nav-item { flex: 1; text-align: center; color: var(--gray); font-size: 10px; font-weight: bold; display: flex; flex-direction: column; align-items: center; }
+        .nav-item i { font-size: 20px; margin-bottom: 3px; }
+        .nav-item.active { color: var(--sky); }
+    </style>
+</head>
+<body>
+
+    <!-- Header Balance -->
+    <div class="header">
+        <span style="font-size:11px; font-weight:bold; color:var(--sky); letter-spacing:1px;">SYEARN NETWORK</span>
+        <div class="balance-box">
+            <h2 class="coin-txt" id="coin-bal">0</h2>
+            <div style="color:#10b981; font-weight:bold; font-size:13px;" id="usd-bal">$0.00</div>
+        </div>
+    </div>
+
+    <!-- SHAFI 1: HOME (WATCH + TASKS) -->
+    <div id="home" class="page">
+        <div class="engine-box">
+            <div class="watch-btn" id="w-btn" onclick="handleWatch()">
+                <!-- Spinner (Hidden initially) -->
+                <div id="w-loader" class="spinner hidden"></div>
+                <!-- Countdown (Hidden initially) -->
+                <div id="w-timer" style="font-size:30px; font-weight:900; color:var(--sky);" class="hidden">10</div>
+                <!-- Default State -->
+                <i class="fa-solid fa-play" id="w-icon"></i>
+                <span id="w-label">WATCH AD</span>
+            </div>
+            <p style="font-size:10px; color:var(--gray); margin-top:5px;">REWARD: +2,500 COINS</p>
+        </div>
+
+        <!-- Tasks Under Rewards -->
+        <div class="home-tasks">
+            <h4 style="font-size:14px; margin-bottom:10px; color:var(--text);">Daily Missions</h4>
+            
+            <div class="task-card" onclick="adTask.show().catch(()=>{})">
+                <div>
+                    <p style="font-weight:bold; font-size:13px;">Native Ad Task</p>
+                    <small style="color:var(--sky);">Dynamic Coin Reward</small>
+                </div>
+                <button class="btn-go">GO</button>
+            </div>
+
+            <div class="task-card">
+                <div>
+                    <p style="font-weight:bold; font-size:13px;">Follow SyEarn Channel</p>
+                    <small style="color:var(--sky);">+10,000 Coins</small>
+                </div>
+                <button class="btn-go" onclick="tg.openTelegramLink('https://t.me/syearnbot')">JOIN</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OTHER PAGES (TASKS, TOP, WALLET, PROFILE) -->
+    <div id="tasks" class="page hidden" style="padding:20px;"><h3>All Tasks</h3></div>
+    <div id="top" class="page hidden" style="padding:20px; text-align:center;"><h3>Leaderboard Coming Soon</h3></div>
+    <div id="wallet" class="page hidden" style="padding:20px;"><h3>Wallet & Withdrawal</h3></div>
+    <div id="profile" class="page hidden" style="padding:20px;"><h3>User Profile</h3></div>
+
+    <!-- FLAT NAVIGATION -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" onclick="navigate('home', this)"><i class="fa-solid fa-house"></i><span>Home</span></div>
+        <div class="nav-item" onclick="navigate('tasks', this)"><i class="fa-solid fa-list-check"></i><span>Tasks</span></div>
+        <div class="nav-item" onclick="navigate('top', this)"><i class="fa-solid fa-trophy"></i><span>Top</span></div>
+        <div class="nav-item" onclick="navigate('wallet', this)"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item" onclick="navigate('profile', this)"><i class="fa-solid fa-user-gear"></i><span>Profile</span></div>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxIVTzVnuV80gZnJiym_zBaulHwY9jllY",
+            authDomain: "syearn-5e918.firebaseapp.com",
+            databaseURL: "https://syearn-5e918-default-rtdb.firebaseio.com",
+            projectId: "syearn-5e918",
+            storageBucket: "syearn-5e918.firebasestorage.app",
+            messagingSenderId: "317825926616",
+            appId: "1:317825926616:web:a5f4050a8f1c8e522a1ead"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const tg = window.Telegram.WebApp;
+        const user = tg.initDataUnsafe.user;
+
+        let cooling = false;
+
+        // Load Data & Auto-Interstitial
+        if (user) {
+            onValue(ref(db, 'users/' + user.id), (snap) => {
+                const data = snap.val();
+                if (data) {
+                    const b = data.balance || 0;
+                    document.getElementById('coin-bal').innerText = b.toLocaleString();
+                    document.getElementById('usd-bal').innerText = "$" + (b/1000000).toFixed(2);
+                }
+            });
+        }
+
+        const adReward = window.Adsgram.init({ blockId: "22599" });
+        window.adTask = window.Adsgram.init({ blockId: "22601" });
+        const adInter = window.Adsgram.init({ blockId: "22602" });
+
+        // SHIGA YA NUNA INTERSTITIAL
+        tg.ready();
+        setTimeout(() => {
+            adInter.show()
+                .then(() => console.log("Interstitial shown"))
+                .catch((e) => console.log("Interstitial failed or skipped"));
+        }, 2000);
+
+        window.handleWatch = async () => {
+            if (cooling) return;
+
+            const loader = document.getElementById('w-loader'), icon = document.getElementById('w-icon'), label = document.getElementById('w-label');
+
+            // NUNA LOADING
+            loader.classList.remove('hidden');
+            icon.classList.add('hidden');
+            label.classList.add('hidden');
+
+            try {
+                const res = await adReward.show();
+                loader.classList.add('hidden'); // CIRE LOADING
+
+                if (res.done) {
+                    await update(ref(db, 'users/' + user.id), { balance: increment(2500) });
+                    startTimer();
+                } else {
+                    icon.classList.remove('hidden'); label.classList.remove('hidden');
+                }
+            } catch (e) {
+                loader.classList.add('hidden');
+                icon.classList.remove('hidden');
+                label.classList.remove('hidden');
+                tg.showAlert("Talla ba ta shirya ba. Sake gwadawa.");
+            }
+        };
+
+        function startTimer() {
+            cooling = true;
+            let sec = 10;
+            const btn = document.getElementById('w-btn'), timer = document.getElementById('w-timer'), label = document.getElementById('w-label');
+            btn.style.opacity = "0.6"; timer.classList.remove('hidden');
+            
+            const iv = setInterval(() => {
+                sec--; timer.innerText = sec;
+                if (sec <= 0) {
+                    clearInterval(iv); cooling = false;
+                    btn.style.opacity = "1"; timer.classList.add('hidden');
+                    document.getElementById('w-icon').classList.remove('hidden');
+                    label.classList.remove('hidden');
+                }
+            }, 1000);
+        }
+
+        window.navigate = (pageId, el) => {
+            document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(pageId).classList.remove('hidden');
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('light');
+        };
+    </script>
+</body>
+</html>
