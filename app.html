@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="ha">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SyEarn Pro - Dashboard</title>
+    
+    <!-- CDNs -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://app.adsgram.ai/js/adsgram-ad-sdk.js"></script>
+
+    <style>
+        :root {
+            --sky: #00d2ff;
+            --gold: #FFD700;
+            --white: #ffffff;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --dark: #1e293b;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding-bottom: 110px;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Header Area */
+        .top-header {
+            background: white;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom-left-radius: 40px;
+            border-bottom-right-radius: 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--white) 0%, #f0faff 100%);
+            padding: 25px;
+            border-radius: 30px;
+            border: 2px solid #eef2f3;
+            box-shadow: 0 10px 25px rgba(0, 210, 255, 0.1);
+            margin-top: 15px;
+        }
+
+        .coin-val {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 38px;
+            color: var(--dark);
+            margin: 5px 0;
+        }
+
+        .usd-val {
+            color: #10b981;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Home Watch Engine */
+        .home-section {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .main-watch-btn {
+            width: 200px;
+            height: 200px;
+            background: var(--white);
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border: 8px solid #f1f5f9;
+            box-shadow: 0 15px 35px rgba(0, 210, 255, 0.15);
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .main-watch-btn i {
+            font-size: 60px;
+            color: var(--sky);
+            text-shadow: 0 4px 10px rgba(0, 210, 255, 0.3);
+        }
+
+        .main-watch-btn span {
+            font-weight: bold;
+            color: var(--sky);
+            letter-spacing: 2px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .main-watch-btn.disabled {
+            background: #f1f5f9;
+            border-color: #e2e8f0;
+            pointer-events: none;
+        }
+
+        /* Native Floating Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            height: 75px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(15px);
+            border-radius: 25px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f1f5f9;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #cbd5e1;
+            transition: 0.3s;
+        }
+
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item span { font-size: 10px; font-weight: bold; }
+
+        .nav-item.active { color: var(--sky); }
+
+        /* The Big Center Button */
+        .center-btn {
+            position: relative;
+            top: -25px;
+            width: 70px;
+            height: 70px;
+            background: var(--sky);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white !important;
+            box-shadow: 0 8px 20px rgba(0, 210, 255, 0.4);
+            border: 5px solid var(--white);
+        }
+
+        .center-btn i { font-size: 26px; margin: 0; }
+
+        /* Task/Wallet Cards */
+        .content-page { padding: 20px; }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #f1f5f9;
+        }
+
+        .btn-go {
+            background: var(--sky);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .cooldown-text {
+            font-size: 28px;
+            font-weight: 900;
+            color: var(--sky);
+            font-family: 'Orbitron';
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Section -->
+    <div class="top-header">
+        <span style="font-size:12px; color:var(--sky); font-weight:bold; letter-spacing:1px;" id="u-name">@SyUser</span>
+        <div class="balance-card">
+            <p style="margin:0; font-size:11px; color:var(--gray); text-transform:uppercase;">SyEarn Assets</p>
+            <h2 class="coin-val" id="c-bal">0</h2>
+            <div class="usd-val" id="u-bal">$0.00</div>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="p-home" class="content-page">
+        <div class="home-section">
+            <h3 style="color:var(--gray); font-size:14px; letter-spacing:2px;">ENGINE STATUS: ACTIVE</h3>
+            <div class="main-watch-btn" id="w-btn" onclick="watchVideo()">
+                <div id="w-timer" class="cooldown-text hidden">10</div>
+                <i class="fa-solid fa-play" id="w-icon"></i>
+                <span id="w-label">WATCH AD</span>
+            </div>
+            <p style="color:var(--gray); font-size:11px;">Earning: +2,500 Coins per session</p>
+        </div>
+    </div>
+
+    <!-- TASK PAGE -->
+    <div id="p-task" class="content-page hidden">
+        <h3 style="color:var(--dark);">Daily Quests</h3>
+        <div class="card" onclick="adTask.show().catch(()=>{})">
+            <div><b>Native Task</b><br><small style="color:var(--sky);">Dynamic Bonus</small></div>
+            <button class="btn-go">GO</button>
+        </div>
+        <div class="card">
+            <div><b>Subscribe Channel</b><br><small style="color:var(--sky);">+10,000 Coins</small></div>
+            <button class="btn-go" onclick="tg.openTelegramLink('https://t.me/syearnbot')">JOIN</button>
+        </div>
+    </div>
+
+    <!-- TOP PAGE -->
+    <div id="p-top" class="content-page hidden">
+        <div style="text-align:center; padding:50px;">
+            <i class="fa-solid fa-trophy" style="font-size:50px; color:var(--gold);"></i>
+            <h3>Leaderboard</h3>
+            <p style="color:var(--gray);">Top SyEarners coming soon.</p>
+        </div>
+    </div>
+
+    <!-- WALLET PAGE -->
+    <div id="p-wallet" class="content-page hidden">
+        <h3 style="color:var(--dark);">Withdraw</h3>
+        <div class="card" style="display:block;">
+            <p style="font-size:12px; color:var(--gray);">Threshold: $5.00 (5M Coins)</p>
+            <div style="height:6px; background:#f1f5f9; border-radius:10px; margin:15px 0;">
+                <div id="w-progress" style="height:100%; background:var(--sky); width:0%; border-radius:10px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE PAGE -->
+    <div id="p-profile" class="content-page hidden">
+        <h3 style="color:var(--dark);">User Profile</h3>
+        <div class="card" style="display:block; text-align:center;">
+            <div style="width:70px; height:70px; background:var(--sky); border-radius:50%; margin:0 auto 15px; display:flex; align-items:center; justify-content:center; color:white; font-size:30px;"><i class="fa-solid fa-user"></i></div>
+            <h4 id="u-full" style="margin:0;">SyUser</h4>
+            <p id="u-id" style="color:var(--gray); font-size:12px;"></p>
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav class="bottom-nav">
+        <div class="nav-item" onclick="tab('task', this)"><i class="fa-solid fa-list-check"></i><span>Task</span></div>
+        <div class="nav-item" onclick="tab('top', this)"><i class="fa-solid fa-ranking-star"></i><span>Top</span></div>
+        <div class="nav-item center-btn active" onclick="tab('home', this)"><i class="fa-solid fa-play"></i></div>
+        <div class="nav-item" onclick="tab('wallet', this)"><i class="fa-solid fa-wallet"></i><span>Wallet</span></div>
+        <div class="nav-item" onclick="tab('profile', this)"><i class="fa-solid fa-user-gear"></i><span>Profile</span></div>
+    </nav>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxIVTzVnuV80gZnJiym_zBaulHwY9jllY",
+            authDomain: "syearn-5e918.firebaseapp.com",
+            databaseURL: "https://syearn-5e918-default-rtdb.firebaseio.com",
+            projectId: "syearn-5e918",
+            storageBucket: "syearn-5e918.firebasestorage.app",
+            messagingSenderId: "317825926616",
+            appId: "1:317825926616:web:a5f4050a8f1c8e522a1ead"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const tg = window.Telegram.WebApp;
+        const user = tg.initDataUnsafe.user;
+
+        let cooling = false;
+
+        if (user) {
+            document.getElementById('u-name').innerText = "@" + (user.username || user.first_name);
+            document.getElementById('u-full').innerText = user.first_name;
+            document.getElementById('u-id').innerText = "UID: " + user.id;
+
+            onValue(ref(db, 'users/' + user.id), (snap) => {
+                const data = snap.val();
+                if (data) {
+                    const bal = data.balance || 0;
+                    document.getElementById('c-bal').innerText = bal.toLocaleString();
+                    document.getElementById('u-bal').innerText = "$" + (bal/1000000).toFixed(2);
+                    document.getElementById('w-progress').style.width = Math.min((bal/5000000)*100, 100) + "%";
+                }
+            });
+        }
+
+        const adReward = window.Adsgram.init({ blockId: "22599" });
+        const adTask = window.Adsgram.init({ blockId: "22601" });
+        const adInter = window.Adsgram.init({ blockId: "22602" });
+
+        // Show interstitial ad on load
+        setTimeout(() => adInter.show().catch(()=>{}), 2000);
+
+        window.watchVideo = async () => {
+            if (cooling) return;
+            try {
+                const res = await adReward.show();
+                if (res.done) {
+                    await update(ref(db, 'users/' + user.id), { balance: increment(2500) });
+                    startTimer();
+                }
+            } catch (e) { tg.showAlert("Ad not ready yet."); }
+        };
+
+        function startTimer() {
+            cooling = true;
+            let sec = 10;
+            const btn = document.getElementById('w-btn'), timer = document.getElementById('w-timer');
+            const icon = document.getElementById('w-icon'), label = document.getElementById('w-label');
+            
+            btn.classList.add('disabled'); icon.classList.add('hidden'); label.classList.add('hidden');
+            timer.classList.remove('hidden');
+
+            const iv = setInterval(() => {
+                sec--; timer.innerText = sec;
+                if (sec <= 0) {
+                    clearInterval(iv); cooling = false;
+                    btn.classList.remove('disabled'); icon.classList.remove('hidden');
+                    label.classList.remove('hidden'); timer.classList.add('hidden');
+                    timer.innerText = "10";
+                }
+            }, 1000);
+        }
+
+        window.tab = (p, el) => {
+            document.querySelectorAll('.content-page').forEach(x => x.classList.add('hidden'));
+            document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+            document.getElementById('p-' + p).classList.remove('hidden');
+            el.classList.add('active');
+            tg.HapticFeedback.impactOccurred('medium');
+        };
+
+        tg.ready();
+    </script>
+</body>
+</html>
